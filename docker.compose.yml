@@ -10,11 +10,11 @@ services:
 
     environment:
 
-      POSTGRES_USER: postgres
+      POSTGRES_USER: process.env.USERNAME
 
-      POSTGRES_PASSWORD: 1234
+      POSTGRES_PASSWORD: process.env.PASSWORD
 
-      POSTGRES_DB: app
+      POSTGRES_DB: process.env.DATABASE
 
     ports:
 
