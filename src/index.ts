@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
 import prismaPlugin from './config/database.js';
 import { userRoutes } from './routes/user.routes.js';
+import "dotenv/config";
 
 const fastify = Fastify({ logger: true });
 
