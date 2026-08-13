@@ -1,12 +1,12 @@
-import { Roles } from "./roles.model";
-
 export interface User {
-  id: number;
-  name: string;
+  id?: number;
+  name?: string | null;
   email: string;
-  password: string;
-  role:number;
-  company:string;
-  phone:number;
-  lastName:string;
+  password?: string | null;
+  role?: string | number | null;
+  company?: string | null;
+  phone?: number | string | null;
+  phonenumber?: number | string | null;
+  lastName?: string | null;
+  lastname?: string | null;
 }
