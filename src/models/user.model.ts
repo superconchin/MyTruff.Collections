@@ -7,4 +7,6 @@ export interface User {
   password: string;
   role:number;
   company:string;
+  phone:number;
+  lastName:string;
 }
