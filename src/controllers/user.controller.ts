@@ -1,9 +1,25 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { User } from '../models/user.model.js';
 
+const toJsonSafeUser = (user: any) => ({
+  ...user,
+  phonenumber:
+    user?.phonenumber !== null && user?.phonenumber !== undefined
+      ? user.phonenumber.toString()
+      : null,
+});
+
+const toBigInt = (value: bigint | number | string | null | undefined): bigint => {
+  if (value === null || value === undefined) {
+    throw new Error('phonenumber is required and must be a valid bigint-compatible value');
+  }
+
+  return typeof value === 'bigint' ? value : BigInt(String(value));
+};
+
 export const getUsers = async (request: FastifyRequest, reply: FastifyReply) => {
   const users = await request.server.prisma.user.findMany();
-  return reply.send(users);
+  return reply.send(users.map(toJsonSafeUser));
 };
 
 export const createUser = async (
@@ -12,31 +28,26 @@ export const createUser = async (
 ) => {
   const user: User = request.body;
 
-  if (!user?.email) {
+  if (!user?.email || !user.company || !user.name || user.role == null || user.phonenumber == null || !user.password) {
     return reply.code(400).send({
-      error: 'Email is required',
+      error: 'company, email, phonenumber, role, name and password are required',
       received: request.body,
     });
   }
 
   const newUser = await request.server.prisma.user.create({
     data: {
-      company: user.company ?? undefined,
+      company: String(user.company),
       email: user.email,
-      phonenumber:
-        user.phonenumber != null
-          ? String(user.phonenumber)
-          : user.phone != null
-            ? String(user.phone)
-            : undefined,
-      role: user.role != null ? String(user.role) : undefined,
-      name: user.name ?? undefined,
-      lastname: user.lastname ?? user.lastName ?? undefined,
-      password: user.password ? String(user.password) : undefined,
+      phonenumber: toBigInt(user.phonenumber),
+      role: Number(user.role),
+      name: String(user.name),
+      lastname: user.lastname ?? user.lastName ?? null,
+      password: String(user.password),
     },
   });
 
-  return reply.code(201).send(newUser);
+  return reply.code(201).send(toJsonSafeUser(newUser));
 };
 
 export const getUserById = async (
@@ -49,7 +60,12 @@ export const getUserById = async (
       id: parseInt(id),
     },
   });
-  return reply.send(user);
+
+  if (!user) {
+    return reply.code(404).send({ message: 'User not found' });
+  }
+
+  return reply.send(toJsonSafeUser(user));
 };
 
 export const updateUser = async (
@@ -64,22 +80,17 @@ export const updateUser = async (
       id: parseInt(id),
     },
     data: {
-      company: user.company ?? undefined,
+      company: user.company != null ? String(user.company) : undefined,
       email: user.email,
-      phonenumber:
-        user.phonenumber != null
-          ? String(user.phonenumber)
-          : user.phone != null
-            ? String(user.phone)
-            : undefined,
-      role: user.role != null ? String(user.role) : undefined,
-      name: user.name ?? undefined,
+      phonenumber: user.phonenumber != null ? toBigInt(user.phonenumber) : undefined,
+      role: user.role != null ? Number(user.role) : undefined,
+      name: user.name != null ? String(user.name) : undefined,
       lastname: user.lastname ?? user.lastName ?? undefined,
-      password: user.password ? String(user.password) : undefined,
+      password: user.password != null ? String(user.password) : undefined,
     },
   });
 
-  return reply.send(updatedUser);
+  return reply.send(toJsonSafeUser(updatedUser));
 };
 
 export const deleteUser = async (

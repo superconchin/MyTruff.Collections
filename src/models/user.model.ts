@@ -3,10 +3,9 @@ export interface User {
   name?: string | null;
   email: string;
   password?: string | null;
-  role?: string | number | null;
+  role?: number | string | null;
   company?: string | null;
-  phone?: number | string | null;
-  phonenumber?: number | string | null;
-  lastName?: string | null;
+  phonenumber?: bigint | number | string | null;
   lastname?: string | null;
+  lastName?: string | null;
 }

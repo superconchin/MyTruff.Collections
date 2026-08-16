@@ -8,13 +8,13 @@ datasource db {
 
 model User {
   id          Int     @id @default(autoincrement())
-  company     String?
-  email       String 
-  phonenumber String?
-  role        String?
-  name        String?
-  lastname    String?
-  password    String? @db.VarChar(100)
+  company     String  @db.VarChar(100)
+  email       String  @db.VarChar(100)
+  phonenumber BigInt
+  role        Int
+  name        String  @db.VarChar(100)
+  lastname    String? @db.VarChar(100)
+  password    String  @db.VarChar(100)
 
   @@map("users")
 }
